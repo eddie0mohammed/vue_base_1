@@ -1,28 +1,95 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Header />
+
+    <AddTodo 
+      v-on:add-todo="addTodo"/>
+
+    <Todos 
+      v-bind:todos="todoItems" 
+      v-on:del-todo="deleteTodo"
+      />
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import Todos from './components/Todos';
+import Header from './components/Header';
+import AddTodo from './components/AddTodo';
+import axios from 'axios';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Todos,
+    Header,
+    AddTodo,
+  },
+
+  data(){
+    return {
+      todoItems: [
+        {
+          id: 1,
+          title: 'Todo One',
+          completed: false
+        },
+        {
+          id: 2,
+          title: 'Todo Two',
+          completed: false
+        },
+        {
+          id: 3,
+          title: 'Todo Three',
+          completed: true
+        },
+      ]
+    }
+  },
+  
+  methods: {
+    deleteTodo(id){
+      const currentTodoItems = this.todoItems;
+      const newTotoItems = currentTodoItems.filter(elem => elem.id !== id);
+      this.todoItems = newTotoItems;
+    },
+
+    addTodo(newTodo) {
+      this.todoItems = [...this.todoItems, newTodo];
+    }
+  },
+
+  // created(){
+  //   axios.get('https://jsonplaceholder.typicode.com/todos')
+  //     .then(res => console.log(res.data))
+  //     .catch(err => console.log(err));
+  // }
+  async created() {
+    try{
+
+      const res = await axios.get('https://jsonplaceholder.typicode.com/todos?_limit=10');
+      const todos = res.data;
+      this.todoItems = todos;
+    }
+    catch (err){
+      console.log(err);
+    }
   }
+
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  line-height: 1.4;
 }
 </style>
